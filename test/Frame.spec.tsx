@@ -578,6 +578,31 @@ describe('The Frame Component', () => {
     });
   });
 
+  describe('sandboxed iframe without allow-same-origin', () => {
+    // With a sandbox lacking allow-same-origin, the iframe gets an opaque origin:
+    // contentDocument is null and contentWindow is cross-origin, so calling
+    // addEventListener/removeEventListener on it throws SecurityError.
+    it('should not crash on unmount', async () => {
+      const { container, unmount } = render(
+        <Frame
+          initialContent="<!DOCTYPE html><html><head></head><body><div></div></body></html>"
+          sandbox="allow-scripts"
+        />
+      );
+
+      const iframe = container.querySelector('iframe')!;
+      await waitFor(() => {
+        expect(iframe.getAttribute('sandbox')).toBe('allow-scripts');
+        // The opaque origin hides the document from the parent even after loading.
+        expect(iframe.contentDocument).toBeNull();
+      });
+
+      expect(() => {
+        unmount();
+      }).not.toThrow();
+    });
+  });
+
   describe('race condition handling', () => {
     it('should handle null document in getMountTarget gracefully', async () => {
       const frameRef = React.createRef<Frame>();
