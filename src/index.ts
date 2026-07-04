@@ -1,5 +1,5 @@
-export { default } from './Frame';
-export type { FrameComponentProps } from './Frame';
+export { default } from './Frame.js';
+export type { FrameComponentProps } from './Frame.js';
 
-export { FrameContext, FrameContextConsumer, FrameContextProvider, useFrame } from './Context';
-export type { FrameContextProps } from './Context';
+export { FrameContext, FrameContextConsumer, FrameContextProvider, useFrame } from './Context.js';
+export type { FrameContextProps } from './Context.js';

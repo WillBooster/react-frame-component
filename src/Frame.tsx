@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import type { FrameContextProps } from './Context';
-import { FrameContextProvider } from './Context';
-import Content from './Content';
+import type { FrameContextProps } from './Context.js';
+import { FrameContextProvider } from './Context.js';
+import Content from './Content.js';
 
-export interface FrameComponentProps extends React.IframeHTMLAttributes<HTMLIFrameElement> {
+interface FrameOwnProps extends React.IframeHTMLAttributes<HTMLIFrameElement> {
   head?: React.ReactNode | undefined;
   mountTarget?: string | undefined;
   initialContent?: string | undefined;
@@ -14,7 +14,12 @@ export interface FrameComponentProps extends React.IframeHTMLAttributes<HTMLIFra
   children?: React.ReactNode | undefined;
 }
 
-interface InternalFrameProps extends FrameComponentProps {
+// The public props type accepts `ref` (forwarded to the underlying iframe element),
+// while the internal class must not declare `ref` in its props so that a ref on
+// `Frame` itself keeps referring to the component instance.
+export type FrameComponentProps = FrameOwnProps & React.RefAttributes<HTMLIFrameElement>;
+
+interface InternalFrameProps extends FrameOwnProps {
   forwardedRef?: React.ForwardedRef<HTMLIFrameElement> | undefined;
 }
 
@@ -164,6 +169,6 @@ export class Frame extends Component<InternalFrameProps, FrameState> {
   }
 }
 
-export default React.forwardRef<HTMLIFrameElement, FrameComponentProps>((props, ref) => (
+export default React.forwardRef<HTMLIFrameElement, FrameOwnProps>((props, ref) => (
   <Frame {...props} forwardedRef={ref} />
 ));
