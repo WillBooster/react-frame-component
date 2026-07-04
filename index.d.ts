@@ -9,7 +9,7 @@ export interface FrameComponentProps
   contentDidMount?: (() => void) | undefined;
   contentDidUpdate?: (() => void) | undefined;
   dangerouslyUseDocWrite?: boolean | undefined;
-  children: React.ReactNode;
+  children?: React.ReactNode | undefined;
 }
 
 declare const FrameComponent: React.ForwardRefExoticComponent<FrameComponentProps>;

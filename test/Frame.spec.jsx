@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { render, waitFor } from '@testing-library/react';
 import { expect, vi, describe, it, afterEach, beforeEach } from 'vitest';
 import ForwardedRefFrame, { Frame } from '../src/Frame';
+import { useFrame } from '../src/Context';
 
 const getColour = (e) => globalThis.getComputedStyle(e).getPropertyValue('color');
 
@@ -405,6 +406,68 @@ describe('The Frame Component', () => {
       expect(ref).toHaveBeenCalled();
       expect(ref.mock.calls[0][0] instanceof HTMLIFrameElement).toBe(true);
     });
+  });
+
+  it('should keep the frame context value referentially stable across re-renders', async () => {
+    const contextValues = [];
+    const ContextRecorder = () => {
+      contextValues.push(useFrame());
+      return <></>;
+    };
+
+    const { container, rerender } = render(
+      <Frame className="first">
+        <ContextRecorder />
+      </Frame>
+    );
+
+    await waitFor(() => {
+      expect(contextValues.length).toBeGreaterThan(0);
+    });
+
+    const lengthBeforeRerender = contextValues.length;
+    rerender(
+      <Frame className="second">
+        <ContextRecorder />
+      </Frame>
+    );
+
+    await waitFor(() => {
+      expect(contextValues.length).toBeGreaterThan(lengthBeforeRerender);
+    });
+
+    const lastValue = contextValues.at(-1);
+    expect(lastValue.document).toBe(container.querySelector('iframe').contentDocument);
+    // The provider must reuse the same object as long as document/window stay the same,
+    // so context consumers are not forced to re-render on every render of Frame.
+    expect(lastValue).toBe(contextValues[lengthBeforeRerender - 1]);
+  });
+
+  it('should not leak frame-specific props onto the iframe element', async () => {
+    const { container } = render(
+      <Frame
+        head={<style>{'body {}'}</style>}
+        mountTarget=".frame-root"
+        contentDidMount={() => {}}
+        contentDidUpdate={() => {}}
+        initialContent='<!DOCTYPE html><html><head></head><body><div class="frame-root"></div></body></html>'
+      />
+    );
+
+    const iframe = container.querySelector('iframe');
+    const frameOnlyAttributes = [
+      'head',
+      'mounttarget',
+      'initialcontent',
+      'dangerouslyusedocwrite',
+      'contentdidmount',
+      'contentdidupdate',
+      'forwardedref',
+    ];
+    for (const attribute of frameOnlyAttributes) {
+      expect(iframe.hasAttribute(attribute)).toBe(false);
+    }
+    expect(iframe.getAttribute('srcdoc')).toContain('frame-root');
   });
 
   describe('dangerouslyUseDocWrite', () => {
