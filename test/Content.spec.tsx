@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import { expect, describe, it, vi } from 'vitest';
 import Content from '../src/Content';
@@ -12,7 +11,7 @@ describe('The Content component', () => {
     );
 
     const div = container.querySelector('div');
-    expect(div.className).toBe('test-class-1');
+    expect(div!.className).toBe('test-class-1');
   });
 
   it('should call contentDidMount on initial render', () => {

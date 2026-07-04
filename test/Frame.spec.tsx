@@ -1,33 +1,32 @@
+import type { ReactElement } from 'react';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { render, waitFor } from '@testing-library/react';
 import { expect, vi, describe, it, afterEach, beforeEach } from 'vitest';
 import ForwardedRefFrame, { Frame } from '../src/Frame';
+import type { FrameContextProps } from '../src/Context';
 import { useFrame } from '../src/Context';
 
-const getColour = (e) => globalThis.getComputedStyle(e).getPropertyValue('color');
+const getColour = (e: Element): string => globalThis.getComputedStyle(e).getPropertyValue('color');
 
-const LegacyContextChild = (props, context) => <div className="childDiv">{context.color}</div>;
-LegacyContextChild.contextTypes = {
-  color: PropTypes.string.isRequired,
-};
+const LegacyContextChild = Object.assign(
+  (_props: unknown, context: { color: string }) => <div className="childDiv">{context.color}</div>,
+  { contextTypes: { color: PropTypes.string.isRequired } }
+);
 
-class LegacyContextParent extends React.Component {
+class LegacyContextParent extends React.Component<{ children: ReactElement }> {
   static childContextTypes = {
     color: PropTypes.string,
   };
-  static propTypes = {
-    children: PropTypes.element.isRequired,
-  };
-  getChildContext() {
+  getChildContext(): { color: string } {
     return { color: 'purple' };
   }
-  render() {
+  override render(): ReactElement {
     return <div>{this.props.children}</div>;
   }
 }
 
-const LegacyContextTestComponent = () => (
+const LegacyContextTestComponent = (): ReactElement => (
   <LegacyContextParent>
     <Frame>
       <LegacyContextChild />
@@ -36,7 +35,7 @@ const LegacyContextTestComponent = () => (
 );
 
 describe('The Frame Component', () => {
-  let div;
+  let div: HTMLDivElement | undefined;
 
   beforeEach(() => {
     div = document.createElement('div');
@@ -54,7 +53,7 @@ describe('The Frame Component', () => {
     const { container } = render(<Frame />);
     const iframe = container.querySelector('iframe');
     expect(iframe).toBeDefined();
-    expect(iframe.contentWindow).toBeDefined();
+    expect(iframe!.contentWindow).toBeDefined();
   });
 
   it('should not pass this.props.children in iframe render', () => {
@@ -65,13 +64,13 @@ describe('The Frame Component', () => {
     );
 
     const iframe = document.querySelector('iframe');
-    expect(iframe.contentDocument.body.children.length).toBe(0);
+    expect(iframe!.contentDocument!.body.children.length).toBe(0);
   });
 
   it('should create an empty iFrame and apply inline styles', () => {
     const { container } = render(<Frame style={{ border: 0 }} />);
     const iframe = container.querySelector('iframe');
-    expect(iframe.style.border).toBe('0px');
+    expect(iframe!.style.border).toBe('0px');
   });
 
   it('should pass along all props to underlying iFrame', () => {
@@ -79,10 +78,10 @@ describe('The Frame Component', () => {
       <Frame className="test-class-1 test-class-2" frameBorder={0} height="100%" width="80%" />
     );
     const iframe = container.querySelector('iframe');
-    expect(iframe.className).toBe('test-class-1 test-class-2');
-    expect(iframe.getAttribute('frameBorder')).toBe('0');
-    expect(iframe.getAttribute('height')).toBe('100%');
-    expect(iframe.getAttribute('width')).toBe('80%');
+    expect(iframe!.className).toBe('test-class-1 test-class-2');
+    expect(iframe!.getAttribute('frameBorder')).toBe('0');
+    expect(iframe!.getAttribute('height')).toBe('100%');
+    expect(iframe!.getAttribute('width')).toBe('80%');
   });
 
   it('should create an iFrame with a <link> tag inside', async () => {
@@ -91,16 +90,16 @@ describe('The Frame Component', () => {
         head={<link href="styles.css" />}
         contentDidMount={() => {
           const iframe = container.querySelector('iframe');
-          const head = iframe.contentDocument.head;
+          const head = iframe!.contentDocument!.head;
           expect(head.querySelector('link')).toBeDefined();
-          expect(head.querySelector('link').href).toContain('styles.css');
+          expect(head.querySelector('link')!.href).toContain('styles.css');
         }}
       />
     );
 
     const iframe = container.querySelector('iframe');
     await waitFor(() => {
-      const head = iframe.contentDocument.head;
+      const head = iframe!.contentDocument!.head;
       expect(head.querySelector('link')).toBeDefined();
     });
   });
@@ -111,11 +110,11 @@ describe('The Frame Component', () => {
         head={<script src="foo.js" />}
         contentDidMount={() => {
           const iframe = container.querySelector('iframe');
-          const head = iframe.contentDocument.head;
-          const body = iframe.contentDocument.body;
+          const head = iframe!.contentDocument!.head;
+          const body = iframe!.contentDocument!.body;
 
           expect(head.querySelector('script')).toBeDefined();
-          expect(head.querySelector('script').src).toContain('foo.js');
+          expect(head.querySelector('script')!.src).toContain('foo.js');
           expect(body.querySelectorAll('h1,h2').length).toBe(2);
         }}
       >
@@ -126,8 +125,8 @@ describe('The Frame Component', () => {
 
     const iframe = container.querySelector('iframe');
     await waitFor(() => {
-      const head = iframe.contentDocument.head;
-      const body = iframe.contentDocument.body;
+      const head = iframe!.contentDocument!.head;
+      const body = iframe!.contentDocument!.body;
       expect(head.querySelector('script')).toBeDefined();
       expect(body.querySelectorAll('h1,h2').length).toBe(2);
     });
@@ -143,7 +142,7 @@ describe('The Frame Component', () => {
         ]}
         contentDidMount={() => {
           const iframe = container.querySelector('iframe');
-          const head = iframe.contentDocument.head;
+          const head = iframe!.contentDocument!.head;
 
           expect(head.querySelectorAll('link').length).toBe(2);
           expect(head.querySelectorAll('script').length).toBe(1);
@@ -153,7 +152,7 @@ describe('The Frame Component', () => {
 
     const iframe = container.querySelector('iframe');
     await waitFor(() => {
-      const head = iframe.contentDocument.head;
+      const head = iframe!.contentDocument!.head;
       expect(head.querySelectorAll('link').length).toBe(2);
       expect(head.querySelectorAll('script').length).toBe(1);
     });
@@ -168,9 +167,9 @@ describe('The Frame Component', () => {
           contentDidMount={() => {
             const iframe = container.querySelector('iframe');
             const elem = container.querySelector('p');
-            const body = iframe.contentDocument.body;
-            expect(getColour(elem)).toBe('rgb(0, 0, 0)');
-            expect(getColour(body.querySelector('p'))).toBe('rgb(255, 0, 0)');
+            const body = iframe!.contentDocument!.body;
+            expect(getColour(elem!)).toBe('rgb(0, 0, 0)');
+            expect(getColour(body.querySelector('p')!)).toBe('rgb(255, 0, 0)');
           }}
         >
           <p>Some text</p>
@@ -181,14 +180,14 @@ describe('The Frame Component', () => {
     await waitFor(() => {
       const iframe = container.querySelector('iframe');
       const elem = container.querySelector('p');
-      const body = iframe.contentDocument.body;
-      expect(getColour(elem)).toBe('rgb(0, 0, 0)');
-      expect(getColour(body.querySelector('p'))).toBe('rgb(255, 0, 0)');
+      const body = iframe!.contentDocument!.body;
+      expect(getColour(elem!)).toBe('rgb(0, 0, 0)');
+      expect(getColour(body.querySelector('p')!)).toBe('rgb(255, 0, 0)');
     });
   });
 
   it('should re-render inside the iframe correctly', async () => {
-    const pRef = React.createRef();
+    const pRef = React.createRef<HTMLParagraphElement>();
     const { container, rerender } = render(
       <Frame contentDidMount={() => {}}>
         <p ref={pRef}>Test 1</p>
@@ -197,10 +196,10 @@ describe('The Frame Component', () => {
 
     await waitFor(() => {
       const iframe = container.querySelector('iframe');
-      expect(iframe.contentDocument.body.querySelector('p').textContent).toBe('Test 1');
+      expect(iframe!.contentDocument!.body.querySelector('p')!.textContent).toBe('Test 1');
     });
 
-    pRef.current.dataset.testValue = 'set on dom';
+    pRef.current!.dataset.testValue = 'set on dom';
 
     rerender(
       <Frame contentDidMount={() => {}}>
@@ -209,8 +208,8 @@ describe('The Frame Component', () => {
     );
 
     await waitFor(() => {
-      expect(pRef.current.textContent).toBe('Test 2');
-      expect(pRef.current.dataset.testValue).toBe('set on dom');
+      expect(pRef.current!.textContent).toBe('Test 2');
+      expect(pRef.current!.dataset.testValue).toBe('set on dom');
     });
   });
 
@@ -219,7 +218,7 @@ describe('The Frame Component', () => {
 
     await waitFor(() => {
       const iframe = document.querySelector('iframe');
-      expect(iframe.contentDocument.body.querySelector('.childDiv').textContent).toBe('purple');
+      expect(iframe!.contentDocument!.body.querySelector('.childDiv')!.textContent).toBe('purple');
     });
   });
 
@@ -232,14 +231,14 @@ describe('The Frame Component', () => {
         initialContent={initialContent}
         contentDidMount={() => {
           const iframe = container.querySelector('iframe');
-          expect(iframe.contentDocument.documentElement.outerHTML).toContain('<script>console.log("foo");</script>');
+          expect(iframe!.contentDocument!.documentElement.outerHTML).toContain('<script>console.log("foo");</script>');
         }}
       />
     );
 
     const iframe = container.querySelector('iframe');
     await waitFor(() => {
-      expect(iframe.contentDocument.documentElement.outerHTML).toContain('<script>console.log("foo");</script>');
+      expect(iframe!.contentDocument!.documentElement.outerHTML).toContain('<script>console.log("foo");</script>');
     });
   });
 
@@ -253,7 +252,7 @@ describe('The Frame Component', () => {
         mountTarget="#mountHere"
         contentDidMount={() => {
           const iframe = container.querySelector('iframe');
-          expect(iframe.contentDocument.querySelectorAll('h1').length).toBe(2);
+          expect(iframe!.contentDocument!.querySelectorAll('h1').length).toBe(2);
         }}
       >
         <h1>And i am joining you</h1>
@@ -262,7 +261,7 @@ describe('The Frame Component', () => {
 
     const iframe = container.querySelector('iframe');
     await waitFor(() => {
-      expect(iframe.contentDocument.querySelectorAll('h1').length).toBe(2);
+      expect(iframe!.contentDocument!.querySelectorAll('h1').length).toBe(2);
     });
   });
 
@@ -314,7 +313,7 @@ describe('The Frame Component', () => {
 
     const iframe = container.querySelector('iframe');
     await waitFor(() => {
-      const body = iframe.contentDocument.body;
+      const body = iframe!.contentDocument!.body;
       expect(body.children.length).toBeGreaterThanOrEqual(0);
     });
   });
@@ -327,7 +326,7 @@ describe('The Frame Component', () => {
 
     const iframe = container.querySelector('iframe');
     await waitFor(() => {
-      expect(iframe.contentDocument.body.querySelector('#container')).toBeDefined();
+      expect(iframe!.contentDocument!.body.querySelector('#container')).toBeDefined();
     });
   });
 
@@ -349,8 +348,8 @@ describe('The Frame Component', () => {
 
     await waitFor(() => {
       const iframes = container.querySelectorAll('iframe');
-      expect(iframes[0].contentDocument.body.querySelector('p').textContent).toBe('Test 1');
-      expect(iframes[1].contentDocument.body.querySelector('p').textContent).toBe('Test 2');
+      expect(iframes[0]!.contentDocument!.body.querySelector('p')!.textContent).toBe('Test 1');
+      expect(iframes[1]!.contentDocument!.body.querySelector('p')!.textContent).toBe('Test 2');
     });
 
     rerender(
@@ -370,8 +369,8 @@ describe('The Frame Component', () => {
 
     await waitFor(() => {
       const iframes = container.querySelectorAll('iframe');
-      expect(iframes[0].contentDocument.body.querySelector('p').textContent).toBe('Test 2');
-      expect(iframes[1].contentDocument.body.querySelector('p').textContent).toBe('Test 1');
+      expect(iframes[0]!.contentDocument!.body.querySelector('p')!.textContent).toBe('Test 2');
+      expect(iframes[1]!.contentDocument!.body.querySelector('p')!.textContent).toBe('Test 1');
     });
   });
 
@@ -386,14 +385,14 @@ describe('The Frame Component', () => {
       <Frame
         contentDidMount={() => {
           const iframes = container.querySelectorAll('iframe');
-          expect(iframes[0].contentDocument.body.children.length).toBe(1);
+          expect(iframes[0]!.contentDocument!.body.children.length).toBe(1);
         }}
       />
     );
 
     await waitFor(() => {
       const iframes = container.querySelectorAll('iframe');
-      expect(iframes[0].contentDocument.body.children.length).toBe(1);
+      expect(iframes[0]!.contentDocument!.body.children.length).toBe(1);
     });
   });
 
@@ -404,13 +403,13 @@ describe('The Frame Component', () => {
 
     await waitFor(() => {
       expect(ref).toHaveBeenCalled();
-      expect(ref.mock.calls[0][0] instanceof HTMLIFrameElement).toBe(true);
+      expect(ref.mock.calls[0]![0] instanceof HTMLIFrameElement).toBe(true);
     });
   });
 
   it('should keep the frame context value referentially stable across re-renders', async () => {
-    const contextValues = [];
-    const ContextRecorder = () => {
+    const contextValues: FrameContextProps[] = [];
+    const ContextRecorder = (): ReactElement => {
       contextValues.push(useFrame());
       return <></>;
     };
@@ -437,7 +436,7 @@ describe('The Frame Component', () => {
     });
 
     const lastValue = contextValues.at(-1);
-    expect(lastValue.document).toBe(container.querySelector('iframe').contentDocument);
+    expect(lastValue!.document).toBe(container.querySelector('iframe')!.contentDocument);
     // The provider must reuse the same object as long as document/window stay the same,
     // so context consumers are not forced to re-render on every render of Frame.
     expect(lastValue).toBe(contextValues[lengthBeforeRerender - 1]);
@@ -465,9 +464,9 @@ describe('The Frame Component', () => {
       'forwardedref',
     ];
     for (const attribute of frameOnlyAttributes) {
-      expect(iframe.hasAttribute(attribute)).toBe(false);
+      expect(iframe!.hasAttribute(attribute)).toBe(false);
     }
-    expect(iframe.getAttribute('srcdoc')).toContain('frame-root');
+    expect(iframe!.getAttribute('srcdoc')).toContain('frame-root');
   });
 
   describe('dangerouslyUseDocWrite', () => {
@@ -477,7 +476,7 @@ describe('The Frame Component', () => {
       );
 
       const iframe = container.querySelector('iframe');
-      expect(iframe.srcdoc).toBeFalsy();
+      expect(iframe!.srcdoc).toBeFalsy();
     });
 
     it('should allow setting initialContent via document.write() when required', async () => {
@@ -504,13 +503,13 @@ describe('The Frame Component', () => {
         expect(contentDidMountCalled).toBe(true);
       });
 
-      expect(iframe.contentDocument.documentElement.outerHTML).toBe(renderedContent);
+      expect(iframe!.contentDocument!.documentElement.outerHTML).toBe(renderedContent);
     });
   });
 
   describe('race condition handling', () => {
     it('should handle null document in getMountTarget gracefully', async () => {
-      const frameRef = React.createRef();
+      const frameRef = React.createRef<Frame>();
       const { container } = render(
         <Frame
           ref={frameRef}
@@ -523,16 +522,16 @@ describe('The Frame Component', () => {
         expect(container.querySelector('iframe')).toBeDefined();
       });
 
-      const getDocSpy = vi.spyOn(frameRef.current, 'getDoc').mockReturnValue(undefined);
+      const getDocSpy = vi.spyOn(frameRef.current!, 'getDoc').mockReturnValue(undefined);
 
-      const mountTargetResult = frameRef.current.getMountTarget();
+      const mountTargetResult = frameRef.current!.getMountTarget();
 
       expect(mountTargetResult).toBeUndefined();
       getDocSpy.mockRestore();
     });
 
     it('should handle null body in getMountTarget gracefully', async () => {
-      const frameRef = React.createRef();
+      const frameRef = React.createRef<Frame>();
       const { container } = render(<Frame ref={frameRef} />);
 
       await waitFor(() => {
@@ -540,9 +539,11 @@ describe('The Frame Component', () => {
       });
 
       // Mock getDoc to return document without body
-      const getDocSpy = vi.spyOn(frameRef.current, 'getDoc').mockReturnValue({ body: undefined });
+      const getDocSpy = vi
+        .spyOn(frameRef.current!, 'getDoc')
+        .mockReturnValue({ body: undefined } as unknown as Document);
 
-      const mountTargetResult = frameRef.current.getMountTarget();
+      const mountTargetResult = frameRef.current!.getMountTarget();
 
       expect(mountTargetResult).toBeUndefined();
       getDocSpy.mockRestore();

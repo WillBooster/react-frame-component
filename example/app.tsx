@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import Frame from '../src';
@@ -8,9 +9,9 @@ const styles = {
   height: '100%',
 };
 
-const Header = ({ children }) => <h1>{children}</h1>;
+const Header = ({ children }: { children: ReactNode }) => <h1>{children}</h1>;
 
-const Content = ({ children }) => <section>{children}</section>;
+const Content = ({ children }: { children: ReactNode }) => <section>{children}</section>;
 
 const App = () => (
   <div>
@@ -21,7 +22,7 @@ const App = () => (
   </div>
 );
 
-createRoot(document.querySelector('#example1')).render(
+createRoot(document.querySelector('#example1') as Element).render(
   <Frame style={styles}>
     <App />
   </Frame>
@@ -39,7 +40,7 @@ const Foobar = () => {
   );
 };
 
-createRoot(document.querySelector('#example2')).render(<Foobar />);
+createRoot(document.querySelector('#example2') as Element).render(<Foobar />);
 
 const ExternalResources = () => {
   const initialContent = `<!DOCTYPE html><html><head>
@@ -59,4 +60,4 @@ const ExternalResources = () => {
   );
 };
 
-createRoot(document.querySelector('#example3')).render(<ExternalResources />);
+createRoot(document.querySelector('#example3') as Element).render(<ExternalResources />);
