@@ -55,7 +55,8 @@ export class Frame extends Component {
   componentWillUnmount() {
     this._isMounted = false;
 
-    this.nodeRef.current.removeEventListener('DOMContentLoaded', this.handleLoad);
+    // The listener was added to the iframe's content window in componentDidMount.
+    this.nodeRef.current?.contentWindow?.removeEventListener('DOMContentLoaded', this.handleLoad);
   }
 
   getDoc() {

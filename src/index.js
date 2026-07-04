@@ -1,3 +1,3 @@
 export { default } from './Frame';
 
-export { FrameContext, FrameContextConsumer, useFrame } from './Context';
+export { FrameContext, FrameContextConsumer, FrameContextProvider, useFrame } from './Context';
