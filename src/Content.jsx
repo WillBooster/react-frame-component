@@ -5,7 +5,7 @@ export default class Content extends Component {
   static propTypes = {
     children: PropTypes.element.isRequired,
     contentDidMount: PropTypes.func.isRequired,
-    contentDidUpdate: PropTypes.func.isRequired
+    contentDidUpdate: PropTypes.func.isRequired,
   };
 
   componentDidMount() {

@@ -1,41 +1,18 @@
 name: Release
-
 on:
   push:
     branches:
-      - master
-
-concurrency: ${{ github.workflow }}-${{ github.ref }}
-
+      - main
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+permissions:
+  id-token: write
+  contents: write
 jobs:
   release:
-    name: Release
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      packages: write
-      id-token: write
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Update npm
-        run: npm install -g npm@latest
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Create Release Pull Request
-        uses: changesets/action@v1
-        with:
-          publish: npm run publish:changesets
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: WillBooster/reusable-workflows/.github/workflows/release.yml@main
+    with:
+      github_hosted_runner: true
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

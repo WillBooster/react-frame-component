@@ -6,7 +6,7 @@ import Content from '../src/Content';
 describe('The Content component', () => {
   it('should render children', () => {
     const { container } = render(
-      <Content contentDidMount={() => null} contentDidUpdate={() => null}>
+      <Content contentDidMount={() => {}} contentDidUpdate={() => {}}>
         <div className="test-class-1" />
       </Content>
     );
