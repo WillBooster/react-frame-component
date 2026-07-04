@@ -12,19 +12,19 @@ export default defineConfig({
       enabled: true,
       provider: playwright({
         launchOptions: {
-          headless: true
-        }
+          headless: true,
+        },
       }),
       instances: [
         {
           browser: 'chromium',
-          headless: true
+          headless: true,
         },
         ...(isCI ? [{ browser: 'firefox', headless: true }] : []),
-        ...(!isCI && isMac ? [{ browser: 'webkit', headless: true }] : [])
-      ]
+        ...(!isCI && isMac ? [{ browser: 'webkit', headless: true }] : []),
+      ],
     },
     globals: true,
-    setupFiles: ['./test/setup.js']
-  }
+    setupFiles: ['./test/setup.js'],
+  },
 });

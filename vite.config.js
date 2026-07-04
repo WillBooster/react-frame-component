@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 
 export default defineConfig(({ command }) => ({
   plugins: [react()],
@@ -8,33 +8,26 @@ export default defineConfig(({ command }) => ({
     command === 'build'
       ? {
           lib: {
-            entry: resolve(__dirname, 'src/index.js'),
+            entry: resolve(import.meta.dirname, 'src/index.js'),
             name: 'ReactFrameComponent',
             formats: ['es', 'umd'],
-            fileName: (format) =>
-              `react-frame-component.${format === 'es' ? 'esm' : format}.js`
+            fileName: (format) => `react-frame-component.${format === 'es' ? 'esm' : format}.js`,
           },
           rollupOptions: {
-            external: [
-              'react',
-              'react/jsx-runtime',
-              'react/jsx-dev-runtime',
-              'react-dom',
-              'prop-types'
-            ],
+            external: ['react', 'react/jsx-runtime', 'react/jsx-dev-runtime', 'react-dom', 'prop-types'],
             output: {
               globals: {
                 react: 'React',
                 'react/jsx-runtime': 'react/jsx-runtime',
                 'react/jsx-dev-runtime': 'react/jsx-dev-runtime',
                 'react-dom': 'ReactDOM',
-                'prop-types': 'PropTypes'
+                'prop-types': 'PropTypes',
               },
-              exports: 'named'
-            }
+              exports: 'named',
+            },
           },
           minify: false,
-          sourcemap: true
+          sourcemap: true,
         }
-      : {}
+      : {},
 }));

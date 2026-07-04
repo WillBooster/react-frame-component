@@ -17,22 +17,18 @@ export class Frame extends Component {
     dangerouslyUseDocWrite: PropTypes.bool,
     contentDidMount: PropTypes.func,
     contentDidUpdate: PropTypes.func,
-    children: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.arrayOf(PropTypes.element)
-    ])
+    children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]),
   };
 
   static defaultProps = {
     style: {},
-    head: null,
+    head: undefined,
     children: undefined,
     mountTarget: undefined,
     dangerouslyUseDocWrite: false,
     contentDidMount: () => {},
     contentDidUpdate: () => {},
-    initialContent:
-      '<!DOCTYPE html><html><head></head><body><div class="frame-root"></div></body></html>'
+    initialContent: '<!DOCTYPE html><html><head></head><body><div class="frame-root"></div></body></html>',
   };
 
   constructor(props, context) {
@@ -48,10 +44,7 @@ export class Frame extends Component {
     const doc = this.getDoc();
 
     if (doc) {
-      this.nodeRef.current.contentWindow.addEventListener(
-        'DOMContentLoaded',
-        this.handleLoad
-      );
+      this.nodeRef.current.contentWindow.addEventListener('DOMContentLoaded', this.handleLoad);
     }
 
     if (this.props.dangerouslyUseDocWrite) {
@@ -62,21 +55,18 @@ export class Frame extends Component {
   componentWillUnmount() {
     this._isMounted = false;
 
-    this.nodeRef.current.removeEventListener(
-      'DOMContentLoaded',
-      this.handleLoad
-    );
+    this.nodeRef.current.removeEventListener('DOMContentLoaded', this.handleLoad);
   }
 
   getDoc() {
-    return this.nodeRef.current ? this.nodeRef.current.contentDocument : null;
+    return this.nodeRef.current ? this.nodeRef.current.contentDocument : undefined;
   }
 
   getMountTarget() {
     const doc = this.getDoc();
 
     if (!doc || !doc.body) {
-      return null;
+      return;
     }
 
     if (this.props.mountTarget) {
@@ -114,13 +104,13 @@ export class Frame extends Component {
 
   renderFrameContents() {
     if (!this._isMounted) {
-      return null;
+      return;
     }
 
     const doc = this.getDoc();
 
     if (!doc) {
-      return null;
+      return;
     }
 
     const contentDidMount = this.props.contentDidMount;
@@ -128,17 +118,14 @@ export class Frame extends Component {
 
     const win = doc.defaultView || doc.parentView;
     const contents = (
-      <Content
-        contentDidMount={contentDidMount}
-        contentDidUpdate={contentDidUpdate}
-      >
+      <Content contentDidMount={contentDidMount} contentDidUpdate={contentDidUpdate}>
         <FrameContextProvider value={{ document: doc, window: win }}>
           <div className="frame-content">{this.props.children}</div>
         </FrameContextProvider>
       </Content>
     );
 
-    if (this.props.dangerouslyUseDocWrite && doc.body.children.length < 1) {
+    if (this.props.dangerouslyUseDocWrite && doc.body.children.length === 0) {
       doc.open('text/html', 'replace');
       doc.write(this.props.initialContent);
       doc.close();
@@ -147,19 +134,16 @@ export class Frame extends Component {
     const mountTarget = this.getMountTarget();
 
     if (!mountTarget) {
-      return null;
+      return;
     }
 
-    return [
-      ReactDOM.createPortal(this.props.head, this.getDoc().head),
-      ReactDOM.createPortal(contents, mountTarget)
-    ];
+    return [ReactDOM.createPortal(this.props.head, this.getDoc().head), ReactDOM.createPortal(contents, mountTarget)];
   }
 
   render() {
     const props = {
       ...this.props,
-      children: undefined // The iframe isn't ready so we drop children from props here. #12, #17
+      children: undefined, // The iframe isn't ready so we drop children from props here. #12, #17
     };
 
     if (!this.props.dangerouslyUseDocWrite) {
@@ -175,6 +159,7 @@ export class Frame extends Component {
     delete props.forwardedRef;
 
     return (
+      // oxlint-disable-next-line jsx-a11y/iframe-has-title -- consumers can pass `title` via the props spread
       <iframe {...props} ref={this.setRef} onLoad={this.handleLoad}>
         {this.state.iframeLoaded && this.renderFrameContents()}
       </iframe>
@@ -182,6 +167,4 @@ export class Frame extends Component {
   }
 }
 
-export default React.forwardRef((props, ref) => (
-  <Frame {...props} forwardedRef={ref} />
-));
+export default React.forwardRef((props, ref) => <Frame {...props} forwardedRef={ref} />);

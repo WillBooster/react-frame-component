@@ -1,12 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { expect, describe, it } from 'vitest';
-import {
-  FrameContextProvider,
-  FrameContextConsumer,
-  FrameContext,
-  useFrame
-} from '../src/Context';
+import { FrameContextProvider, FrameContextConsumer, FrameContext, useFrame } from '../src/Context';
 
 describe('The DocumentContext Component', () => {
   it('will establish context variables', async () => {
@@ -41,7 +36,7 @@ describe('The DocumentContext Component', () => {
         expect(win).toEqual({ bar: 2 });
       }
       render() {
-        return null;
+        return <></>;
       }
     }
     Child.contextType = FrameContext;
@@ -65,7 +60,7 @@ describe('The DocumentContext Component', () => {
           {({ document: doc, window: win }) => {
             expect(doc).toEqual(document);
             expect(win).toEqual(window);
-            return null;
+            return <></>;
           }}
         </FrameContextConsumer>
       );

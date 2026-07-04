@@ -5,7 +5,7 @@ import Frame from '../src';
 const styles = {
   border: '1px solid',
   width: '100%',
-  height: '100%'
+  height: '100%',
 };
 
 const Header = ({ children }) => <h1>{children}</h1>;
@@ -32,10 +32,7 @@ const Foobar = () => {
   return (
     <Frame style={styles} head={<style>{'*{color:red}'}</style>}>
       <h1>Frame example of wrapping component</h1>
-      <p>
-        This is also showing encapuslated styles. All text is red inside this
-        component.
-      </p>
+      <p>This is also showing encapuslated styles. All text is red inside this component.</p>
       {toggle && <h2>Hello</h2>}
       <button onClick={() => updateToggle(!toggle)}>Toggle</button>
     </Frame>
@@ -55,8 +52,8 @@ const ExternalResources = () => {
     <Frame initialContent={initialContent}>
       <h1>External Resources</h1>
       <p>
-        This tests loading external resources via initialContent which can
-        create timing issues with onLoad and srcdoc in cached situations
+        This tests loading external resources via initialContent which can create timing issues with onLoad and srcdoc
+        in cached situations
       </p>
     </Frame>
   );
