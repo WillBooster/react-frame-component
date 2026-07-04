@@ -17,14 +17,14 @@ export default defineConfig({
       }),
       instances: [
         {
-          browser: 'chromium',
+          browser: 'chromium' as const,
           headless: true,
         },
-        ...(isCI ? [{ browser: 'firefox', headless: true }] : []),
-        ...(!isCI && isMac ? [{ browser: 'webkit', headless: true }] : []),
+        ...(isCI ? [{ browser: 'firefox' as const, headless: true }] : []),
+        ...(!isCI && isMac ? [{ browser: 'webkit' as const, headless: true }] : []),
       ],
     },
     globals: true,
-    setupFiles: ['./test/setup.js'],
+    setupFiles: ['./test/setup.ts'],
   },
 });
