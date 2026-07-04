@@ -99,7 +99,12 @@ export class Frame extends React.Component<InternalFrameProps, FrameState> {
     this._isMounted = false;
 
     // The listener was added to the iframe's content window in componentDidMount.
-    this.nodeRef.current?.contentWindow?.removeEventListener('DOMContentLoaded', this.handleLoad);
+    // A null document means the content window is cross-origin (e.g. a sandbox
+    // without allow-same-origin) — no listener was added there, and touching the
+    // window would throw SecurityError and crash the unmounting React tree.
+    if (this.getDoc()) {
+      this.nodeRef.current?.contentWindow?.removeEventListener('DOMContentLoaded', this.handleLoad);
+    }
   }
 
   getDoc(): Document | undefined {
