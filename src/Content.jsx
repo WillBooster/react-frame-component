@@ -1,4 +1,4 @@
-import React, { Component, Children } from 'react'; // eslint-disable-line no-unused-vars
+import { Children, Component } from 'react';
 import PropTypes from 'prop-types';
 
 export default class Content extends Component {

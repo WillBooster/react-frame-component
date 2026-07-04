@@ -89,19 +89,11 @@ export class Frame extends Component {
   };
 
   handleLoad = () => {
-    clearInterval(this.loadCheck);
     // Bail update as some browsers will trigger on both DOMContentLoaded & onLoad ala firefox
     if (!this.state.iframeLoaded) {
       this.setState({ iframeLoaded: true });
     }
   };
-
-  // In certain situations on a cold cache DOMContentLoaded never gets called
-  // fallback to an interval to check if that's the case
-  loadCheck = () =>
-    setInterval(() => {
-      this.handleLoad();
-    }, 500);
 
   renderFrameContents() {
     if (!this._isMounted) {
@@ -114,13 +106,17 @@ export class Frame extends Component {
       return;
     }
 
-    const contentDidMount = this.props.contentDidMount;
-    const contentDidUpdate = this.props.contentDidUpdate;
+    const { contentDidMount, contentDidUpdate } = this.props;
 
     const win = doc.defaultView || doc.parentView;
+    // Reuse the context value across renders so consumers only re-render when the
+    // document or window actually changes, not on every render of Frame.
+    if (!this._contextValue || this._contextValue.document !== doc || this._contextValue.window !== win) {
+      this._contextValue = { document: doc, window: win };
+    }
     const contents = (
       <Content contentDidMount={contentDidMount} contentDidUpdate={contentDidUpdate}>
-        <FrameContextProvider value={{ document: doc, window: win }}>
+        <FrameContextProvider value={this._contextValue}>
           <div className="frame-content">{this.props.children}</div>
         </FrameContextProvider>
       </Content>
@@ -138,30 +134,33 @@ export class Frame extends Component {
       return;
     }
 
-    return [ReactDOM.createPortal(this.props.head, this.getDoc().head), ReactDOM.createPortal(contents, mountTarget)];
+    return [
+      ReactDOM.createPortal(this.props.head, doc.head, 'head'),
+      ReactDOM.createPortal(contents, mountTarget, 'contents'),
+    ];
   }
 
   render() {
-    const props = {
-      ...this.props,
-      children: undefined, // The iframe isn't ready so we drop children from props here. #12, #17
-    };
+    // The iframe isn't ready so we drop children from the iframe props here. #12, #17
+    const {
+      children: _children,
+      contentDidMount: _contentDidMount,
+      contentDidUpdate: _contentDidUpdate,
+      dangerouslyUseDocWrite,
+      forwardedRef: _forwardedRef,
+      head: _head,
+      initialContent,
+      mountTarget: _mountTarget,
+      ...iframeProps
+    } = this.props;
 
-    if (!this.props.dangerouslyUseDocWrite) {
-      props.srcDoc = this.props.initialContent;
+    if (!dangerouslyUseDocWrite) {
+      iframeProps.srcDoc = initialContent;
     }
-
-    delete props.head;
-    delete props.initialContent;
-    delete props.mountTarget;
-    delete props.dangerouslyUseDocWrite;
-    delete props.contentDidMount;
-    delete props.contentDidUpdate;
-    delete props.forwardedRef;
 
     return (
       // oxlint-disable-next-line jsx-a11y/iframe-has-title -- consumers can pass `title` via the props spread
-      <iframe {...props} ref={this.setRef} onLoad={this.handleLoad}>
+      <iframe {...iframeProps} ref={this.setRef} onLoad={this.handleLoad}>
         {this.state.iframeLoaded && this.renderFrameContents()}
       </iframe>
     );
