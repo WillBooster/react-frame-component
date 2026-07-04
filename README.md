@@ -46,13 +46,13 @@ ReactDOM.render(
 
 ###### head
 
-`head:  PropTypes.node`
+`head?: React.ReactNode`
 
 The `head` prop is a dom node that gets inserted before the children of the frame. Note that this is injected into the body of frame (see the blog post for why). This has the benefit of being able to update and works for stylesheets.
 
 ###### initialContent
 
-`initialContent:  PropTypes.string`
+`initialContent?: string`
 
 Defaults to `'<!DOCTYPE html><html><head></head><body><div></div></body></html>'`
 
@@ -60,7 +60,7 @@ The `initialContent` props is the initial html injected into frame. It is only i
 
 ###### mountTarget
 
-`mountTarget:  PropTypes.string`
+`mountTarget?: string`
 
 The `mountTarget` props is a css selector (#target/.target) that specifies where in the `initialContent` of the iframe, children will be mounted.
 
@@ -73,7 +73,7 @@ The `mountTarget` props is a css selector (#target/.target) that specifies where
 
 ###### dangerouslyUseDocWrite
 
-`dangerouslyUseDocWrite: PropTypes.bool`
+`dangerouslyUseDocWrite?: boolean`
 
 Defaults to `false`
 
@@ -81,8 +81,8 @@ The frame's initial content, as defined by the `initialContent` prop, is populat
 
 ###### contentDidMount and contentDidUpdate
 
-`contentDidMount:  PropTypes.func`
-`contentDidUpdate:  PropTypes.func`
+`contentDidMount?: () => void`
+`contentDidUpdate?: () => void`
 
 `contentDidMount` and `contentDidUpdate` are conceptually equivalent to
 `componentDidMount` and `componentDidUpdate`, respectively. The reason these are
@@ -93,7 +93,7 @@ when the frame contents are mounted and updated.
 
 ###### ref
 
-`ref: PropTypes.oneOfType([ PropTypes.func, PropTypes.shape({ current: PropTypes.instanceOf(Element) }) ])`
+`ref?: React.Ref<HTMLIFrameElement>`
 
 The `ref` prop provides a way to access inner iframe DOM node. To utilitize this prop use, for example, one of the React's built-in methods to create a ref: [`React.createRef()`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) or [`React.useRef()`](https://reactjs.org/docs/hooks-reference.html#useref).
 
