@@ -507,6 +507,77 @@ describe('The Frame Component', () => {
     });
   });
 
+  describe('DOM mutation by scripts inside the iframe', () => {
+    // Documents loaded into the iframe (e.g. generated apps) freely mutate their own
+    // DOM. React must not crash with NotFoundError when it later unmounts or updates
+    // the portals whose nodes were removed or moved by such scripts.
+    it('should not crash on unmount when the mounted children were removed from the mount target', async () => {
+      const initialContent = "<!DOCTYPE html><html><head></head><body><div id='app'></div></body></html>";
+      const { container, unmount } = render(
+        <Frame initialContent={initialContent}>
+          <p>mounted by react</p>
+        </Frame>
+      );
+
+      const iframe = container.querySelector('iframe')!;
+      await waitFor(() => {
+        expect(iframe.contentDocument!.body.querySelector('p')).not.toBeNull();
+      });
+
+      // Simulate the embedded app re-rendering its own UI, wiping React's portal children.
+      iframe.contentDocument!.querySelector('#app')!.innerHTML = '<div>rendered by the app</div>';
+
+      expect(() => {
+        unmount();
+      }).not.toThrow();
+    });
+
+    it('should not crash on remount (key change) when the mounted children were removed', async () => {
+      const initialContent = "<!DOCTYPE html><html><head></head><body><div id='app'></div></body></html>";
+      const { container, rerender } = render(
+        <Frame key="first" initialContent={initialContent}>
+          <p>mounted by react</p>
+        </Frame>
+      );
+
+      const iframe = container.querySelector('iframe')!;
+      await waitFor(() => {
+        expect(iframe.contentDocument!.body.querySelector('p')).not.toBeNull();
+      });
+
+      iframe.contentDocument!.querySelector('#app')!.innerHTML = '<div>rendered by the app</div>';
+
+      expect(() => {
+        rerender(
+          <Frame key="second" initialContent={initialContent}>
+            <p>mounted by react</p>
+          </Frame>
+        );
+      }).not.toThrow();
+
+      await waitFor(() => {
+        const remountedIframe = container.querySelector('iframe')!;
+        expect(remountedIframe.contentDocument!.body.querySelector('p')).not.toBeNull();
+      });
+    });
+
+    it('should not crash on unmount when head elements were removed from the document head', async () => {
+      const { container, unmount } = render(<Frame head={<style>{'body { color: red; }'}</style>} />);
+
+      const iframe = container.querySelector('iframe')!;
+      await waitFor(() => {
+        expect(iframe.contentDocument!.head.querySelector('style')).not.toBeNull();
+      });
+
+      // Simulate the embedded app replacing the document head contents.
+      iframe.contentDocument!.head.querySelector('style')!.remove();
+
+      expect(() => {
+        unmount();
+      }).not.toThrow();
+    });
+  });
+
   describe('race condition handling', () => {
     it('should handle null document in getMountTarget gracefully', async () => {
       const frameRef = React.createRef<Frame>();
