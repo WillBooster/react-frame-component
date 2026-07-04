@@ -33,6 +33,47 @@ interface FrameState {
 // element that we render react into.
 const DEFAULT_INITIAL_CONTENT = '<!DOCTYPE html><html><head></head><body><div class="frame-root"></div></body></html>';
 
+const resilientContainers = new WeakSet<Node>();
+
+/**
+ * Makes a portal container tolerate DOM mutations performed by scripts running
+ * inside the iframe document.
+ *
+ * Scripts in the loaded document (e.g. `initialContent` of a generated app) may
+ * remove or move the nodes React rendered into the container. React would then
+ * throw `NotFoundError` from `removeChild`/`insertBefore` while committing an
+ * update or unmount, crashing the parent React tree. Shadowing these methods on
+ * the container node itself (not on the realm's prototypes, so the embedded
+ * app's own DOM code keeps standard semantics) lets React degrade gracefully.
+ */
+function makePortalContainerResilient(container: Element): void {
+  if (resilientContainers.has(container)) {
+    return;
+  }
+  resilientContainers.add(container);
+
+  const originalRemoveChild = container.removeChild.bind(container);
+  container.removeChild = <T extends Node>(child: T): T => {
+    // The child was already detached by the embedded document's scripts; React
+    // only wants it gone from the container, so this is a successful no-op.
+    if (child.parentNode !== container) {
+      return child;
+    }
+    return originalRemoveChild(child) as T;
+  };
+
+  const originalInsertBefore = container.insertBefore.bind(container);
+  container.insertBefore = <T extends Node>(node: T, reference: Node | null): T => {
+    // The reference sibling was detached by the embedded document's scripts;
+    // appending is the closest position that keeps the node in the container.
+    if (reference !== null && reference.parentNode !== container) {
+      container.append(node);
+      return node;
+    }
+    return originalInsertBefore(node, reference) as T;
+  };
+}
+
 export class Frame extends React.Component<InternalFrameProps, FrameState> {
   private _isMounted = false;
   private _contextValue: FrameContextProps | undefined;
@@ -135,6 +176,9 @@ export class Frame extends React.Component<InternalFrameProps, FrameState> {
     if (!mountTarget) {
       return undefined;
     }
+
+    makePortalContainerResilient(doc.head);
+    makePortalContainerResilient(mountTarget);
 
     return [
       ReactDOM.createPortal(this.props.head, doc.head, 'head'),
