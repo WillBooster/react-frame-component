@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import type { FrameContextProps } from './Context.js';
 import { FrameContextProvider } from './Context.js';
 import Content from './Content.js';
@@ -33,7 +33,7 @@ interface FrameState {
 // element that we render react into.
 const DEFAULT_INITIAL_CONTENT = '<!DOCTYPE html><html><head></head><body><div class="frame-root"></div></body></html>';
 
-export class Frame extends Component<InternalFrameProps, FrameState> {
+export class Frame extends React.Component<InternalFrameProps, FrameState> {
   private _isMounted = false;
   private _contextValue: FrameContextProps | undefined;
   private readonly nodeRef: React.MutableRefObject<HTMLIFrameElement | null> = React.createRef();
