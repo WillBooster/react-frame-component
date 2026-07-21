@@ -6,7 +6,6 @@
     "declarationMap": true,
     "esModuleInterop": true,
     "importHelpers": false,
-    "jsx": "react-jsx",
     "lib": ["esnext", "dom", "dom.iterable"],
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -18,15 +17,17 @@
     "noUnusedParameters": true,
     "outDir": "./dist",
     "paths": {
-      "@willbooster/react-frame-component": ["./src/index.ts"]
+      "@willbooster/react-frame-component": ["./src/index.ts"],
+      "undici-types": ["./node_modules/undici-types/index.d.ts"]
     },
     "resolveJsonModule": true,
     "rootDir": ".",
     "skipLibCheck": true,
     "strict": true,
     "target": "es2020",
-    "types": ["node", "vitest/globals"]
+    "types": ["node", "vitest/globals", "bun"]
   },
-  "extends": ["@tsconfig/node-lts/tsconfig.json", "@tsconfig/node-ts/tsconfig.json"],
-  "include": ["*.config.ts", "example/**/*", "src/**/*", "test/**/*"]
+  "exclude": ["test/fixtures"],
+  "extends": ["@tsconfig/bun/tsconfig.json", "@tsconfig/node-lts/tsconfig.json", "@tsconfig/node-ts/tsconfig.json"],
+  "include": ["*.config.ts", "example/**/*", "scripts/**/*", "src/**/*", "test/**/*"]
 }

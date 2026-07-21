@@ -1,8 +1,10 @@
 # React &lt;Frame /> component
 
-[![Test](https://github.com/WillBooster/react-frame-component/actions/workflows/test.yml/badge.svg)](https://github.com/WillBooster/react-frame-component/actions/workflows/test.yml)
 [![Deploy example](https://github.com/WillBooster/react-frame-component/actions/workflows/deploy-example.yml/badge.svg)](https://github.com/WillBooster/react-frame-component/actions/workflows/deploy-example.yml)
+[![Test](https://github.com/WillBooster/react-frame-component/actions/workflows/test.yml/badge.svg)](https://github.com/WillBooster/react-frame-component/actions/workflows/test.yml)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+[![wbfy](https://img.shields.io/badge/wbfy-3357a7b3--local-1e90ff.svg)](https://github.com/WillBooster/shared/tree/main/packages/wbfy)
+
 [![NPM version][npm-image]][npm-url]
 
 This component allows you to encapsulate your entire React application or per component in an iFrame.

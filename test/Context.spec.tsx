@@ -34,7 +34,7 @@ describe('The DocumentContext Component', () => {
     const window = { bar: 2 } as unknown as FakeWindow;
 
     class Child extends React.Component {
-      static contextType = FrameContext;
+      static override contextType = FrameContext;
       declare context: React.ContextType<typeof FrameContext>;
       override componentDidMount(): void {
         const { document: doc, window: win } = this.context;
