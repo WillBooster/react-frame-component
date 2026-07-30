@@ -3,9 +3,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { render, waitFor } from '@testing-library/react';
 import { expect, vi, describe, it, afterEach, beforeEach } from 'vitest';
-import ForwardedRefFrame, { Frame } from '../src/Frame';
-import type { FrameContextProps } from '../src/Context';
-import { useFrame } from '../src/Context';
+import ForwardedRefFrame, { Frame } from '../../src/Frame';
+import type { FrameContextProps } from '../../src/Context';
+import { useFrame } from '../../src/Context';
 
 const getColour = (e: Element): string => globalThis.getComputedStyle(e).getPropertyValue('color');
 
