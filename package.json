@@ -48,6 +48,7 @@
     "start": "npm run serve",
     "test": "bun wb test",
     "test:watch": "vitest",
+    "test/ci": "bun wb test-on-ci",
     "test/ci-setup": "playwright install --with-deps chromium firefox",
     "typecheck": "bun wb typecheck",
     "verify": "bun wb verify",
@@ -70,12 +71,12 @@
     "@vitest/browser-playwright": "^4.0.18",
     "@willbooster/oxfmt-config": "1.2.2",
     "@willbooster/oxlint-config": "1.4.8",
-    "@willbooster/wb": "15.3.0",
-    "build-ts": "19.0.0",
+    "@willbooster/wb": "19.5.3",
+    "build-ts": "21.0.0",
     "conventional-changelog-conventionalcommits": "^9.3.1",
     "lefthook": "2.1.10",
-    "oxfmt": "0.59.0",
-    "oxlint": "1.74.0",
+    "oxfmt": "0.61.0",
+    "oxlint": "1.76.0",
     "oxlint-tsgolint": "7.0.2001",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
@@ -92,6 +93,7 @@
     "react-dom": ">= 16.8 || ^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }
