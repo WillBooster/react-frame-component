@@ -1,6 +1,6 @@
 import { render, waitFor } from '@testing-library/react';
 import { expect, describe, it, vi } from 'vitest';
-import Content from '../src/Content';
+import Content from '../../src/Content';
 
 describe('The Content component', () => {
   it('should render children', () => {

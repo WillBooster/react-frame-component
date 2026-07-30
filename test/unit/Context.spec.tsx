@@ -2,7 +2,7 @@ import type { ReactElement } from 'react';
 import React from 'react';
 import { render } from '@testing-library/react';
 import { expect, describe, it } from 'vitest';
-import { FrameContextProvider, FrameContextConsumer, FrameContext, useFrame } from '../src/Context';
+import { FrameContextProvider, FrameContextConsumer, FrameContext, useFrame } from '../../src/Context';
 
 type FakeDocument = Document & { x?: number; foo?: number };
 type FakeWindow = Window & { y?: number; bar?: number };
