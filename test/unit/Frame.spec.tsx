@@ -634,7 +634,6 @@ describe('The Frame Component', () => {
         expect(container.querySelector('iframe')).toBeDefined();
       });
 
-      // Mock getDoc to return document without body
       const getDocSpy = vi
         .spyOn(frameRef.current!, 'getDoc')
         .mockReturnValue({ body: undefined } as unknown as Document);
