@@ -5,7 +5,7 @@
 [![Test](https://github.com/WillBooster/react-frame-component/actions/workflows/test.yml/badge.svg)](https://github.com/WillBooster/react-frame-component/actions/workflows/test.yml)
 [![Deploy example](https://github.com/WillBooster/react-frame-component/actions/workflows/deploy-example.yml/badge.svg)](https://github.com/WillBooster/react-frame-component/actions/workflows/deploy-example.yml)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![wbfy](https://img.shields.io/badge/wbfy-20.17.0-1e90ff.svg)](https://github.com/WillBooster/shared/tree/main/packages/wbfy)
+[![wbfy](https://img.shields.io/badge/wbfy-20.20.0-1e90ff.svg)](https://github.com/WillBooster/shared/tree/main/packages/wbfy)
 
 [![NPM version][npm-image]][npm-url]
 
