@@ -1,8 +1,9 @@
+import { render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import React from 'react';
-import { render } from '@testing-library/react';
-import { expect, describe, it } from 'vitest';
-import { FrameContextProvider, FrameContextConsumer, FrameContext, useFrame } from '../../src/Context';
+import { describe, expect, it } from 'vitest';
+
+import { FrameContext, FrameContextConsumer, FrameContextProvider, useFrame } from '../../src/Context';
 
 type FakeDocument = Document & { x?: number; foo?: number };
 type FakeWindow = Window & { y?: number; bar?: number };

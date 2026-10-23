@@ -1,8 +1,9 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+
+import Content from './Content.js';
 import type { FrameContextProps } from './Context.js';
 import { FrameContextProvider } from './Context.js';
-import Content from './Content.js';
 
 interface FrameOwnProps extends React.IframeHTMLAttributes<HTMLIFrameElement> {
   head?: React.ReactNode | undefined;
