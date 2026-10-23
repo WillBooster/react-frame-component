@@ -17,8 +17,7 @@
     "noUnusedParameters": true,
     "outDir": "./dist",
     "paths": {
-      "@willbooster/react-frame-component": ["./src/index.ts"],
-      "undici-types": ["./node_modules/undici-types/index.d.ts"]
+      "@willbooster/react-frame-component": ["./src/index.ts"]
     },
     "resolveJsonModule": true,
     "rootDir": ".",

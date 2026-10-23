@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+
 import Frame from '../src';
 
 const styles = {
